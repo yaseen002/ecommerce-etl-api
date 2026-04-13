@@ -1,27 +1,15 @@
-"""
-Database session configuration.
-
-Provides SQLAlchemy engine and session factory.
-"""
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, declarative_base
+from src.config.settings import settings  # import the instance
 
-from src.config.settings import settings
+engine = create_engine(settings.DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-
-class Base(DeclarativeBase):
-    """Base ORM model class."""
-    pass
-
-
-engine = create_engine(
-    settings.DATABASE_URL,
-    pool_pre_ping=True,
-)
-
-SessionLocal = sessionmaker(
-    autoflush=False,
-    autocommit=False,
-    bind=engine,
-)
+# Dependency for API
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

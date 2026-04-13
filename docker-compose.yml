@@ -1,20 +1,30 @@
+version: '3.9'
+
 services:
-
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: ecommerce_postgres
-    restart: always
-
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secure_password
-      POSTGRES_DB: ecommerce
-
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_db
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: ecommerce_api
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/ecommerce_db
 
 volumes:
   postgres_data:
