@@ -1,19 +1,13 @@
-"""
-Application configuration module.
-
-Loads environment variables and provides database connection settings.
-"""
-
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class Settings:
-    """Central configuration class."""
-
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
 
+    def validate(self) -> None:
+        if not self.DATABASE_URL:
+            raise ValueError("DATABASE_URL is not set")
 
 settings = Settings()

@@ -1,15 +1,12 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from src.config.settings import settings  # import the instance
+from src.config.settings import settings
 
-engine = create_engine(settings.DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+engine = None
 
-# Dependency for API
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+def get_engine():
+    global engine
+    if engine is None:
+        if not settings.DATABASE_URL:
+            raise ValueError("DATABASE_URL not configured")
+        engine = create_engine(settings.DATABASE_URL)
+    return engine
