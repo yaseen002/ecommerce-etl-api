@@ -1,5 +1,3 @@
-      - name: Validate FastAPI app import
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          python -c "from src.main import app; print('App import successful')"
+- name: Validate FastAPI app import
+  run: |
+    python -c "import src.main; print('App imported successfully')"

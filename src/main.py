@@ -11,3 +11,7 @@ app.include_router(products.router, prefix="/api")
 @app.get("/")
 def root():
     return {"message": "E-Commerce ETL API is running"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
