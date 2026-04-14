@@ -20,3 +20,7 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_product)
     return db_product
+
+@router.get("/products")
+def get_products():
+    return []

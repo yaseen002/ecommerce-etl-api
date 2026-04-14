@@ -26,7 +26,7 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ecommerce_db
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/ecommerce_db
 
     steps:
       - name: Checkout code
@@ -37,19 +37,35 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Install dependencies safely
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Wait for Postgres readiness (extra safety layer)
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
+      # Run DB migrations
       - name: Run Alembic migrations
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/ecommerce_db
         run: |
           alembic upgrade head
 
+      # Validate FastAPI app import
       - name: Validate FastAPI import
         run: |
           python -c "import src.main; print('App imports successfully')"
 
+      # Run integration tests
       - name: Run API tests
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/ecommerce_db
         run: |
-          pytest
+          pytest -q
