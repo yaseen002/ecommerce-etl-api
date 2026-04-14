@@ -49,3 +49,7 @@ jobs:
       - name: Validate FastAPI import
         run: |
           python -c "import src.main; print('App imports successfully')"
+
+      - name: Run API tests
+        run: |
+          pytest
